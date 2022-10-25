@@ -17,9 +17,46 @@
 
 require ( [ "https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"], function (Chart) {
 
-var kanbanDataHandler = function () {
+// Configurable variables:
+const metrics_prefix = "MetricsType";
 
-	let dateColumns = ['selected','work','work end','done','discarded'];
+const column1 = ['options', "#45c17f"];
+const column2 = ['todo', "#d2d398"];
+const column3 = ['doing', "#af6f59"];
+const column4 = ['presenting', "#ca061a"];
+const column5 = ['done', "#0fb46e"];
+
+const dateColumns = [column1[0], column2[0], column3[0], column4[0], column5[0]];
+
+const cfdOptions = [
+			[column1[0], column1[0], column1[1] ],
+			[column2[0], column2[0], column2[1]],
+			[column3[0], column3[0], column3[1]],
+			[column4[0], column4[0], column4[1]],
+			[column5[0], column5[0], column5[1]],			
+];
+
+const discardedColumn = 'discarded';
+
+const typeToColor = {
+	// Kanban Cop work types
+	"Expedite": "#970909",
+	"CoP-Card": "#1568D1",
+};
+
+const partition = [
+	[2, "2h"],
+	[8, "8h"],
+	[24, "1d"],
+	[48, "2d"],
+	[120, "5d"],
+	[240, "10d"],
+	[10000, "> 10d"],
+];
+
+// logic for tampermonkey
+
+var kanbanDataHandler = function () {
 
 	function workOnDates ( data, checkDateColumns ) {
 		if ( ! checkDateColumns ) {
@@ -97,7 +134,7 @@ var kanbanDataHandler = function () {
 		return applyToDateValues ( data, workOnColumns, getMaxNumber );
 	}
 
-	function isNumber ( a ) {
+	function isNumber ( a ) {
 		return typeof a === 'number' && isFinite(a);
 	}
 
@@ -207,8 +244,6 @@ var modalCanvas = function () {
 var kanbanCFD = function ( Chart, kanbanDataHandler, modalCanvas ) {
 	let defaultTimeOfDailyInMs = 3600 * 9 * 1000;
 
-	let discardedColumn = 'discarded';
-
 	function createStructureCopy ( input ) {
 		return JSON.parse(JSON.stringify( input ));
 	}
@@ -252,7 +287,7 @@ var kanbanCFD = function ( Chart, kanbanDataHandler, modalCanvas ) {
 				walkDate -= millisecondsOfADay;
 			}
 
-			while ( currentState < options.length ) {
+			while ( currentState < options.length ) {
 				while ( entry[ options [ currentState ][1]] && ( walkDate >=  entry[ options [ currentState ][1]])) {
 					result [ options[currentState][0]][walkDate]++;
 					walkDate -= millisecondsOfADay;
@@ -340,23 +375,7 @@ if ( typeof (module) !== 'undefined' ) {
 // const { getLTDData } = require("./kanbanDataHandler");
 
 var kanbanLTD = function ( Chart, kanbanDataHandler, modalCanvas ) {
-	let typeToColor = {
-		// new work types
-		"improve": "#6FDD71",
-		"documentation": "#346A52",
-		"konzept": "#F3A241",
-		"organisatorisches": "#FBDE51",
-		"beratung": "#FBDE51",
-		"expedite": "#EB57CC",
-		"lernen": "#EB57CC",
-
-		// old work types (for the archive)
-		"(depr.) verpflichtung": "#17b1b5",
-		"(depr.) ungeplant": "#ff3bcb",
-		"(depr.) ritual": "#ff951a",
-		"(depr.) support": "#d6770a",
-	};
-
+	
 	let workTypes = Object.keys ( typeToColor );
 
     function computeLTDData ( data, partition ) {
@@ -445,24 +464,7 @@ if ( typeof (module) !== 'undefined' ) {
 }
 var kanbanRunChart = function ( Chart, kanbanDataHandler, modalCanvas ) {
 
-	let typeToColor = {
-		// new work types
-		"improve": "#6FDD71",
-		"documentation": "#346A52",
-		"konzept": "#F3A241",
-		"organisatorisches": "#FBDE51",
-		"beratung": "#FBDE51",
-		"expedite": "#EB57CC",
-		"lernen": "#EB57CC",
-
-		// old work types (for the archive)
-		"(depr.) verpflichtung": "#17b1b5",
-		"(depr.) ungeplant": "#ff3bcb",
-		"(depr.) ritual": "#ff951a",
-		"(depr.) support": "#d6770a",
-	};
-
-	let workTypes = Object.keys ( typeToColor );
+	 let workTypes = Object.keys ( typeToColor );
 
 
     /**
@@ -562,8 +564,6 @@ if ( typeof (module) !== 'undefined' ) {
 	module.exports = kanbanRunChart;
 }
 var conceptBoardIntegration = function ( kanbanLTD, kanbanCFD, kanbanRunChart ) {
-
-	let metrics_prefix = "MetricsType";
 
     function getMetrics() {
 		let extracted = [];
@@ -674,28 +674,11 @@ var conceptBoardIntegration = function ( kanbanLTD, kanbanCFD, kanbanRunChart ) 
 	}
 
 	function showLTD () {
-		let partition = [
-			[2, "2h"],
-			[8, "8h"],
-			[24, "1d"],
-			[48, "2d"],
-			[120, "5d"],
-			[240, "10d"],
-			[10000, "> 10d"],
-		];
-
 		kanbanLTD.show ( getMetrics(), partition);
 	}
 
 	function showCFD () {
-		let options = [
-			["done", "done", "#45c17f" ],
-			["review", "work end", "#d2d398"],
-			["in progress", "work", "#af6f59"],
-			["committed", "selected", "#ca061a"]
-		];
-
-		kanbanCFD.show ( getMetrics(), options );
+		kanbanCFD.show ( getMetrics(), cfdOptions );
 	}
 
 
