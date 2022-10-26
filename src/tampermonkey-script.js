@@ -4,7 +4,7 @@
 // @version      0.1
 // @description  add kanban metric buttons to concept board
 // @author       Holger Janßen-Kroll
-// @match        https://app.conceptboard.com/*
+// @match        https://igus.conceptboard.com/*
 // @grant        none
 // @run-at       document-end
 // @require http://code.jquery.com/jquery-latest.js
