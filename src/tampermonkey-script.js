@@ -17,9 +17,9 @@
 
 	require(["https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"], function (Chart) {
 
-		let colDone = "done";
-		let colStart = "todo"; 
-		let colLabel = "type";
+		const colDone = "done";
+		const colStart = "todo"; 
+		const colLabel = "type";
 
 		// Configurable variables:
 		const metrics_prefix = "MetricsType";
