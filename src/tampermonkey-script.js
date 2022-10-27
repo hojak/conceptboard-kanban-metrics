@@ -573,9 +573,9 @@
 						if (element.innerText.startsWith(metrics_prefix + ":")) {
 							let typeStringSplitted = element.innerText.split(":", 2);
 							let extractedData = {
-								"type": typeStringSplitted[1].trim()
+								[colLabel]: typeStringSplitted[1].trim().toLowerCase()
 							};
-
+							
 							let sibling = element;
 							while (sibling = sibling.nextSibling) {
 								if (sibling.nodeName == "SPAN") {									
