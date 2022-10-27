@@ -386,22 +386,22 @@
 				let result = {};
 
 				data.forEach(entry => {
-					if (entry.done && entry.work) {
-						let durationInHours = (entry.done - entry.work) / 3600000;
+					if (entry[colDone] && entry[colStart]) {
+						let durationInHours = (entry[colDone] - entry[colStart]) / 3600000;
 
 						let fitsIn = 0;
 						while (partition[fitsIn] && partition[fitsIn][0] < durationInHours) {
 							fitsIn++;
 						}
 
-						if (!result[entry.type]) {
-							result[entry.type] = [];
+						if (!result[entry[colLabel]]) {
+							result[entry[colLabel]] = [];
 							for (let i = 0; i <= partition.length; i++) {
-								result[entry.type][i] = 0;
+								result[entry[colLabel]][i] = 0;
 							}
 						}
 
-						result[entry.type][fitsIn]++;
+						result[entry[colLabel]][fitsIn]++;
 					}
 				});
 
@@ -486,7 +486,6 @@
 					})
 					.map(element => {
 						let done = new Date(element[colDone]);
-						console.log(element);
 						return [done.getDate() + ". " + (done.getMonth() + 1) + ".", (element[colDone] - element[colStart]) / 3600000, element[colLabel]];
 					});
 
